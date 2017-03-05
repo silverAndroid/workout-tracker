@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'models/workout.dart';
-import 'models/exercise.dart';
+
 import 'fake_data.dart';
+import 'models/exercise.dart';
+import 'models/workout.dart';
 import 'tap_card.dart';
 
 class WorkoutPage extends StatelessWidget {
@@ -52,15 +53,17 @@ class _WorkoutListState extends State<WorkoutList> {
   }
 
   List<_WorkoutListItem> buildWorkoutList() {
-    return _workouts.map((workout) => new _WorkoutListItem(workout)).toList();
+    return _workouts.map((workout) => new _WorkoutListItem(workout, 0))
+        .toList();
   }
 }
 
 class _WorkoutListItem extends StatelessWidget {
 
   Workout workout;
+  int index;
 
-  _WorkoutListItem(this.workout);
+  _WorkoutListItem(this.workout, this.index);
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +73,9 @@ class _WorkoutListItem extends StatelessWidget {
 
     return new MyCard(
       onTap: () {
-        print('clicked');
+        Navigator.of(context).push(new MaterialPageRoute(
+          builder: (BuildContext context) => new WorkoutDetailsPage(index),
+        ));
       },
       child: new Column(
         children: [
@@ -98,4 +103,73 @@ class _WorkoutListItem extends StatelessWidget {
       ),
     );
   }
+}
+
+class WorkoutDetailsPage extends StatelessWidget {
+
+  int workoutID;
+
+  WorkoutDetailsPage(this.workoutID);
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: new AppBar(
+      // Here we take the value from the MyHomePage object that
+      // was created by the App.build method, and use it to set
+      // our appbar title.
+        title: new Text('Exercises'),
+      ),
+      body: new WorkoutDetailsList(workoutID),
+      floatingActionButton: new FloatingActionButton(
+        onPressed: (() => print('FAB pressed, not incrementing..')),
+        tooltip: 'Increment',
+        child: new Icon(Icons.add),
+      ), // This trailing comma tells the Dart formatter to use
+    // a style that looks nicer for build methods.
+    );
+  }
+}
+
+class WorkoutDetailsList extends StatefulWidget {
+
+  int workoutID;
+
+  WorkoutDetailsList(this.workoutID);
+
+  @override
+  State<StatefulWidget> createState() => new WorkoutDetailsState();
+}
+
+class WorkoutDetailsState extends State<WorkoutDetailsList> {
+
+  List<Exercise> exercises;
+
+  @override
+  void initState() {
+    super.initState();
+    exercises = Data.workouts[config.workoutID].exercises;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new ListView(
+      children: buildWorkoutDetailsList(),
+    );
+  }
+
+  List<_WorkoutDetailsListItem> buildWorkoutDetailsList() {
+    return exercises.map((exercise) => new _WorkoutDetailsListItem(exercise))
+        .toList();
+  }
+}
+
+class _WorkoutDetailsListItem extends ListItem {
+
+  Exercise exercise;
+
+  _WorkoutDetailsListItem(this.exercise) : super(
+    title: new Text(exercise.name),
+    subtitle: new Text(exercise.description),
+  );
 }
