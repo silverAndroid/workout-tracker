@@ -7,9 +7,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   String _title = 'Workout Tracker';
-  Map<String, WidgetBuilder> routes = {
-
-  };
 
   // This widget is the root of your application.
   @override
