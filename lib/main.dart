@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'workout_view.dart';
 
 void main() {
@@ -7,10 +8,16 @@ void main() {
 
 class MyApp extends StatelessWidget {
   String _title = 'Workout Tracker';
+  PlatformMethodChannel dbPlatform = const PlatformMethodChannel('database');
+
+  void initDB() {
+    dbPlatform.invokeMethod('initDB');
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    initDB();
     return new MaterialApp(
       title: _title,
       theme: new ThemeData(
