@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'exercise_view.dart';
 import 'fake_data.dart';
 import 'models/exercise.dart';
 import 'models/workout.dart';
@@ -164,12 +165,25 @@ class WorkoutDetailsState extends State<WorkoutDetailsList> {
   }
 }
 
-class _WorkoutDetailsListItem extends ListItem {
+class _WorkoutDetailsListItem extends StatelessWidget {
 
   Exercise exercise;
 
-  _WorkoutDetailsListItem(this.exercise) : super(
-    title: new Text(exercise.name),
-    subtitle: new Text(exercise.description),
-  );
+  _WorkoutDetailsListItem(this.exercise);
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return new ListItem(
+      title: new Text(exercise.name),
+      subtitle: new Text(
+        '${exercise.recommendedSets} sets of ${exercise.recommendedReps}',
+      ),
+      onTap: () {
+        Navigator.of(context).push(new MaterialPageRoute<Null>(
+          builder: (BuildContext context) => new ExercisePage(0),
+        ));
+      },
+    );
+  }
 }
