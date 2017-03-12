@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'platform_method.dart';
+
 class ExercisePage extends StatelessWidget {
 
   int exerciseID;
@@ -36,9 +38,10 @@ class ExerciseView extends StatefulWidget {
 }
 
 class ExerciseState extends State<ExerciseView> {
-  PlatformMethodChannel dbPlatform = const PlatformMethodChannel('database');
+  PlatformMethodChannel dbPlatform = new PlatformMethod().dbPlatform;
+  int numReps, weight;
 
-  Future<String> query(String query, List<String> params) {
+  Future<String> rawQuery(String query, List<String> params) {
     if (query != null && query.isNotEmpty && params != null) {
       Map<String, dynamic> json = {
         'query': '\'$query\'',
@@ -59,7 +62,7 @@ class ExerciseState extends State<ExerciseView> {
   }
 
   Future submit() async {
-    return await query('SELECT * FROM android_metadata;', []);
+    return await rawQuery('SELECT * FROM android_metadata;', []);
   }
 
   @override

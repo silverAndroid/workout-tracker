@@ -10,15 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
-
 import io.flutter.plugin.common.FlutterMethodChannel;
-import io.flutter.view.FlutterView;
 
 /**
  * Created by silver_android on 05/03/17.
@@ -28,19 +20,9 @@ public class SQLiteQueryExecutor extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "workout_tracker";
     private static final int DB_VERSION = 1;
-    private final FlutterView flutterView;
-    private Charset utfset;
-    private CharsetEncoder encoder;
-    private CharsetDecoder decoder;
 
-    public SQLiteQueryExecutor(Context context, FlutterView flutterView) {
+    public SQLiteQueryExecutor(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
-        this.flutterView = flutterView;
-
-        this.flutterView.addOnBinaryMessageListenerAsync("query", rawQuery);
-        utfset = Charset.forName("UTF-8");
-        encoder = utfset.newEncoder();
-        decoder = utfset.newDecoder();
     }
 
     @Override
@@ -53,7 +35,7 @@ public class SQLiteQueryExecutor extends SQLiteOpenHelper {
 
     }
 
-    public void rawQuery(String queryJSON, FlutterMethodChannel.Response response) {
+    void rawQuery(String queryJSON, FlutterMethodChannel.Response response) {
         try {
             JSONObject queryObj = new JSONObject(queryJSON);
             String query = queryObj.getString("query");
@@ -66,39 +48,11 @@ public class SQLiteQueryExecutor extends SQLiteOpenHelper {
 
             SQLiteDatabase database = write ? getWritableDatabase() : getReadableDatabase();
             Cursor cursor = database.rawQuery(query, params);
-//            ByteBuffer responseBuffer = ByteBuffer.wrap(.getBytes());
             response.success(cursorToJSON(cursor).toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
-
-    public final FlutterView.OnBinaryMessageListenerAsync rawQuery = new FlutterView.OnBinaryMessageListenerAsync() {
-        @Override
-        public void onMessage(FlutterView flutterView, ByteBuffer byteBuffer, FlutterView.BinaryMessageResponse binaryMessageResponse) {
-            try {
-                byteBuffer.flip();
-                byte[] bytes = new byte[byteBuffer.remaining()];
-                byteBuffer.get(bytes);
-                CharBuffer buffer = decoder.decode(byteBuffer);
-                JSONObject queryObj = new JSONObject(buffer.toString());
-                String query = queryObj.getString("query");
-                JSONArray paramsArray = queryObj.getJSONArray("params");
-                String[] params = new String[paramsArray.length()];
-                for (int i = 0, length = paramsArray.length(); i < length; i++) {
-                    params[i] = paramsArray.getString(i);
-                }
-                boolean write = queryObj.getBoolean("write");
-
-                SQLiteDatabase database = write ? getWritableDatabase() : getReadableDatabase();
-                Cursor cursor = database.rawQuery(query, params);
-                ByteBuffer responseBuffer = ByteBuffer.wrap(cursorToJSON(cursor).toString().getBytes());
-                binaryMessageResponse.send(responseBuffer);
-            } catch (JSONException | CharacterCodingException e) {
-                e.printStackTrace();
-            }
-        }
-    };
 
     private JSONArray cursorToJSON(Cursor cursor) throws JSONException {
         JSONArray cursorJSON = new JSONArray();

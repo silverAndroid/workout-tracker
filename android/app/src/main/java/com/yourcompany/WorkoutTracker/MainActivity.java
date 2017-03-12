@@ -2,13 +2,9 @@ package com.yourcompany.WorkoutTracker;
 
 import android.os.Bundle;
 
-import java.nio.ByteBuffer;
-
 import io.flutter.app.FlutterActivity;
 import io.flutter.plugin.common.FlutterMethodChannel;
 import io.flutter.plugin.common.MethodCall;
-import io.flutter.view.FlutterMain;
-import io.flutter.view.FlutterView;
 
 public class MainActivity extends FlutterActivity {
 
@@ -33,7 +29,7 @@ public class MainActivity extends FlutterActivity {
     }
 
     private void initDB() {
-        queryExecutor = new SQLiteQueryExecutor(getApplicationContext(), getFlutterView());
+        queryExecutor = new SQLiteQueryExecutor(getApplicationContext());
     }
 }
 

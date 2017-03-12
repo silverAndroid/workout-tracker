@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'platform_method.dart';
 import 'workout_view.dart';
 
 void main() {
@@ -8,7 +10,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   String _title = 'Workout Tracker';
-  PlatformMethodChannel dbPlatform = const PlatformMethodChannel('database');
+  PlatformMethodChannel dbPlatform = new PlatformMethod().dbPlatform;
 
   void initDB() {
     dbPlatform.invokeMethod('initDB');
