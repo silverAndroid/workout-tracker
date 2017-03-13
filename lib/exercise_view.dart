@@ -38,31 +38,15 @@ class ExerciseView extends StatefulWidget {
 }
 
 class ExerciseState extends State<ExerciseView> {
-  PlatformMethodChannel dbPlatform = new PlatformMethod().dbPlatform;
   int numReps, weight;
 
-  Future<String> rawQuery(String query, List<String> params) {
-    if (query != null && query.isNotEmpty && params != null) {
-      Map<String, dynamic> json = {
-        'query': '\'$query\'',
-        'params': params,
-        'write': false
-      };
-      print(json.toString());
-      try {
-        return dbPlatform.invokeMethod('query', json.toString()).then((result) {
-          print(result);
-        });
-      } on PlatformException catch (e) {
-        print('Failed to query db');
-        print(e.message);
-      }
-    }
-    return new Future<String>.value("[]");
-  }
-
   Future submit() async {
-    return await rawQuery('SELECT * FROM android_metadata;', []);
+    return await new PlatformMethod().rawQuery(
+        'INSERT INTO SETS (NUM_REPS, WEIGHT, EXERCISE_ID) VALUES (?, ?, ?)', [
+      numReps,
+      weight,
+      0,
+    ], true, false);
   }
 
   @override
@@ -72,10 +56,18 @@ class ExerciseState extends State<ExerciseView> {
       child: new Column(
         children: [
           new Input(
+            onChanged: (value) {
+              if (value.text.isNotEmpty)
+                numReps = int.parse(value.text);
+            },
             labelText: 'Reps',
             keyboardType: TextInputType.number,
           ),
           new Input(
+            onChanged: (value) {
+              if (value.text.isNotEmpty)
+                weight = int.parse(value.text);
+            },
             labelText: 'Weight',
             keyboardType: TextInputType.number,
           ),
