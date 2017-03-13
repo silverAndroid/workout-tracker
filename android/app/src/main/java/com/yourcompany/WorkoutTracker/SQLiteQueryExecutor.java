@@ -5,10 +5,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Base64;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import io.flutter.plugin.common.FlutterMethodChannel;
 
@@ -45,12 +48,19 @@ public class SQLiteQueryExecutor extends SQLiteOpenHelper {
                 params[i] = paramsArray.getString(i);
             }
             boolean write = queryObj.getBoolean("write");
+            boolean executable = queryObj.getBoolean("executable");
 
             SQLiteDatabase database = write ? getWritableDatabase() : getReadableDatabase();
-            Cursor cursor = database.rawQuery(query, params);
-            response.success(cursorToJSON(cursor).toString());
+            if (executable) {
+                database.execSQL(query, params);
+                response.success("");
+            } else {
+                Cursor cursor = database.rawQuery(query, params);
+                response.success(cursorToJSON(cursor).toString());
+            }
         } catch (JSONException e) {
             e.printStackTrace();
+            response.error(e.getMessage(), "", "");
         }
     }
 
