@@ -16,7 +16,7 @@ class PlatformMethod {
   }
 
   Future<String> rawQuery(String query, List<dynamic> params, bool writeToDB,
-      bool isExecutable) {
+      {bool isExecutable = false}) {
     if (query != null && query.isNotEmpty && params != null) {
       Map<String, dynamic> json = {
         'query': query,

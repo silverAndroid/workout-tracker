@@ -46,7 +46,7 @@ class ExerciseState extends State<ExerciseView> {
       numReps,
       weight,
       0,
-    ], true, false);
+    ], true);
   }
 
   @override
