@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:async';
+
+import 'package:flutter/material.dart';
 
 import 'platform_method.dart';
 import 'workout_view.dart';
