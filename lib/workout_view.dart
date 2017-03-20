@@ -174,7 +174,7 @@ class _WorkoutDetailsListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return new ListItem(
+    return new ListTile(
       title: new Text(exercise.name),
       subtitle: new Text(
         '${exercise.recommendedSets} sets of ${exercise.recommendedReps}',
