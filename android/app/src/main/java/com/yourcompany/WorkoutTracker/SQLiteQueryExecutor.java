@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Base64;
 import android.util.Log;
 
+import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,18 +21,13 @@ import io.flutter.plugin.common.FlutterMethodChannel;
  * Created by silver_android on 05/03/17.
  */
 
-public class SQLiteQueryExecutor extends SQLiteOpenHelper {
+public class SQLiteQueryExecutor extends SQLiteAssetHelper {
 
-    private static final String DB_NAME = "workout_tracker";
+    private static final String DB_NAME = "workout_tracker.db";
     private static final int DB_VERSION = 1;
 
     public SQLiteQueryExecutor(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-
     }
 
     @Override
