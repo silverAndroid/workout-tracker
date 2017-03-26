@@ -1,9 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'exercise_view.dart';
 import 'fake_data.dart';
 import 'models/exercise.dart';
 import 'models/workout.dart';
+import 'platform_method.dart';
 import 'tap_card.dart';
 
 class WorkoutPage extends StatelessWidget {
@@ -12,9 +16,9 @@ class WorkoutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-      // Here we take the value from the MyHomePage object that
-      // was created by the App.build method, and use it to set
-      // our appbar title.
+        // Here we take the value from the MyHomePage object that
+        // was created by the App.build method, and use it to set
+        // our appbar title.
         title: new Text('Workouts'),
       ),
       body: new WorkoutList(),
@@ -23,7 +27,7 @@ class WorkoutPage extends StatelessWidget {
         tooltip: 'Increment',
         child: new Icon(Icons.add),
       ), // This trailing comma tells the Dart formatter to use
-    // a style that looks nicer for build methods.
+      // a style that looks nicer for build methods.
     );
   }
 }
@@ -43,19 +47,42 @@ class _WorkoutListState extends State<WorkoutList> {
   @override
   void initState() {
     super.initState();
-    _workouts = Data.workouts;
+    loadWorkouts();
   }
 
   @override
   Widget build(BuildContext context) {
-    return new ListView(
-      children: buildWorkoutList(),
-    );
+    Widget body;
+
+    if (_workouts == null) {
+      body = new Center(
+        child: new Text(
+          'Loading workouts...',
+        ),
+      );
+    } else {
+      body = new ListView(
+        children: buildWorkoutList(),
+      );
+    }
+
+    return body;
   }
 
   List<_WorkoutListItem> buildWorkoutList() {
     return _workouts.map((workout) => new _WorkoutListItem(workout, 0))
         .toList();
+  }
+
+  Future<List<Workout>> loadWorkouts() {
+    return new PlatformMethod()
+        .rawQuery('SELECT * FROM workouts;', [], false)
+        .then((json) {
+      setState(() {
+        _workouts = JSON.decode(json);
+        print(_workouts);
+      });
+    });
   }
 }
 
@@ -116,9 +143,9 @@ class WorkoutDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-      // Here we take the value from the MyHomePage object that
-      // was created by the App.build method, and use it to set
-      // our appbar title.
+        // Here we take the value from the MyHomePage object that
+        // was created by the App.build method, and use it to set
+        // our appbar title.
         title: new Text('Exercises'),
       ),
       body: new WorkoutDetailsList(workoutID),
@@ -127,7 +154,7 @@ class WorkoutDetailsPage extends StatelessWidget {
         tooltip: 'Increment',
         child: new Icon(Icons.add),
       ), // This trailing comma tells the Dart formatter to use
-    // a style that looks nicer for build methods.
+      // a style that looks nicer for build methods.
     );
   }
 }
