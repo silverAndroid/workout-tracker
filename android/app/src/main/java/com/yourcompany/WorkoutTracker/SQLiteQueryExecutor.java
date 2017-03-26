@@ -3,17 +3,13 @@ package com.yourcompany.WorkoutTracker;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Base64;
-import android.util.Log;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 import io.flutter.plugin.common.FlutterMethodChannel;
 
@@ -23,7 +19,7 @@ import io.flutter.plugin.common.FlutterMethodChannel;
 
 public class SQLiteQueryExecutor extends SQLiteAssetHelper {
 
-    private static final String DB_NAME = "workout_tracker.db";
+    private static final String DB_NAME = "workout-tracker.db";
     private static final int DB_VERSION = 1;
 
     public SQLiteQueryExecutor(Context context) {
