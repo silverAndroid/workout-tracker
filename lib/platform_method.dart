@@ -27,9 +27,7 @@ class PlatformMethod {
       String jsonStr = JSON.encode(json);
       print(jsonStr);
       try {
-        return dbPlatform.invokeMethod('query', jsonStr).then((result) {
-          print(result);
-        });
+        return dbPlatform.invokeMethod('query', jsonStr);
       } on PlatformException catch (e) {
         print('Failed to query db');
         print(e.message);
