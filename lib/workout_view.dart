@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:WorkoutTracker/create_view.dart';
 import 'package:flutter/material.dart';
 
 import 'exercise_view.dart';
@@ -12,6 +13,24 @@ import 'tap_card.dart';
 
 class WorkoutPage extends StatelessWidget {
 
+  _WorkoutList _workoutListElement;
+
+  WorkoutPage() {
+    _workoutListElement = new _WorkoutList();
+  }
+
+  VoidCallback _createWorkout(BuildContext context) {
+    return () async {
+      bool updated = await Navigator.of(context).push(
+          new MaterialPageRoute<bool>(
+              builder: (BuildContext context) => new CreateWorkoutPage()
+          ));
+      if (updated) {
+        this._workoutListElement.state.loadWorkouts();
+      }
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -21,10 +40,10 @@ class WorkoutPage extends StatelessWidget {
         // our appbar title.
         title: new Text('Workouts'),
       ),
-      body: new WorkoutList(),
+      body: _workoutListElement,
       floatingActionButton: new FloatingActionButton(
-        onPressed: (() => print('FAB pressed, not incrementing..')),
-        tooltip: 'Increment',
+        onPressed: this._createWorkout(context),
+        tooltip: 'New workout',
         child: new Icon(Icons.add),
       ), // This trailing comma tells the Dart formatter to use
       // a style that looks nicer for build methods.
@@ -32,15 +51,20 @@ class WorkoutPage extends StatelessWidget {
   }
 }
 
-class WorkoutList extends StatefulWidget {
+class _WorkoutList extends StatefulWidget {
 
-  WorkoutList({Key key}) : super(key: key);
+  _WorkoutListState state;
+
+  _WorkoutList({Key key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => new _WorkoutListState();
+  State<StatefulWidget> createState() {
+    state = new _WorkoutListState();
+    return state;
+  }
 }
 
-class _WorkoutListState extends State<WorkoutList> {
+class _WorkoutListState extends State<_WorkoutList> {
 
   List<Workout> _workouts;
 
@@ -56,9 +80,7 @@ class _WorkoutListState extends State<WorkoutList> {
 
     if (_workouts == null) {
       body = new Center(
-        child: new Text(
-          'Loading workouts...',
-        ),
+        child: new CircularProgressIndicator(),
       );
     } else {
       body = new ListView(
@@ -74,13 +96,12 @@ class _WorkoutListState extends State<WorkoutList> {
         .toList();
   }
 
-  Future<List<Workout>> loadWorkouts() {
+  Future<Null> loadWorkouts() {
     return new PlatformMethod()
         .rawQuery('SELECT * FROM workouts;', [], false)
         .then((json) {
       setState(() {
-        _workouts = JSON.decode(json);
-        print(_workouts);
+        _workouts = JSON.decode(json).map((workout) => new Workout(workout['NAME'], workout['DESCRIPTION'], [], [])).toList();
       });
     });
   }
