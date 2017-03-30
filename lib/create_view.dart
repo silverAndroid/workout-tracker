@@ -46,11 +46,20 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
       form.save();
       await new PlatformMethod().rawQuery(
           'INSERT INTO WORKOUTS (NAME, DESCRIPTION) VALUES (?, ?)',
-          [_workout.name, _workout.description], true);
+          [_workout.name, _workout.description], 
+          true
+      );
       print('Query complete');
       Navigator.of(context).pop(true);
       print('pop');
     }
+  }
+
+  String _validateName(InputValue value) {
+    if (value.text.isEmpty) {
+      return 'Name is required.';
+    }
+    return null;
   }
 
   @override
@@ -64,6 +73,7 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
           new TextField(
             labelText: 'Name',
             onSaved: (InputValue val) => _workout.name = val.text,
+            validator: _validateName,
           ),
           new TextField(
             labelText: 'Description',
