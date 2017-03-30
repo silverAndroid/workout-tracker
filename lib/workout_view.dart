@@ -45,8 +45,7 @@ class WorkoutPage extends StatelessWidget {
         onPressed: this._createWorkout(context),
         tooltip: 'New workout',
         child: new Icon(Icons.add),
-      ), // This trailing comma tells the Dart formatter to use
-      // a style that looks nicer for build methods.
+      ),
     );
   }
 }
