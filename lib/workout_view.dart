@@ -25,7 +25,7 @@ class WorkoutPage extends StatelessWidget {
           new MaterialPageRoute<bool>(
               builder: (BuildContext context) => new CreateWorkoutPage()
           ));
-      if (updated) {
+      if (updated != null && updated) {
         this._workoutListElement.state.loadWorkouts();
       }
     };
@@ -95,7 +95,7 @@ class _WorkoutListState extends State<_WorkoutList> {
         .toList();
   }
 
-  Future<Null> loadWorkouts() {
+  Future loadWorkouts() {
     return new PlatformMethod()
         .rawQuery('SELECT * FROM workouts;', [], false)
         .then((json) {

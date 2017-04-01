@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'platform_method.dart';
 import 'workout_view.dart';
 
-Future<Null> initDB() async {
-  PlatformMethod platformMethod = new PlatformMethod();
-  await platformMethod.dbPlatform.invokeMethod('initDB');
+Future initDB() async {
+  await new PlatformMethod().dbPlatform.invokeMethod('initDB');
 }
 
 void main() {
