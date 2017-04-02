@@ -53,18 +53,22 @@ class ExerciseState extends State<ExerciseView> {
     return new Container(
       child: new Column(
         children: [
-          new Input(
-            onChanged: (value) {
-              if (value.text.isNotEmpty) numReps = int.parse(value.text);
+          new TextField(
+            onChanged: (String value) {
+              if (value.isNotEmpty) numReps = int.parse(value);
             },
-            labelText: 'Reps',
+            decoration: new InputDecoration(
+              labelText: 'Reps',
+            ),
             keyboardType: TextInputType.number,
           ),
-          new Input(
-            onChanged: (value) {
-              if (value.text.isNotEmpty) weight = int.parse(value.text);
+          new TextField(
+            onChanged: (String value) {
+              if (value.isNotEmpty) weight = int.parse(value);
             },
-            labelText: 'Weight',
+            decoration: new InputDecoration(
+              labelText: 'Weight',
+            ),
             keyboardType: TextInputType.number,
           ),
           new RaisedButton(
@@ -199,10 +203,9 @@ class _ExerciseExpansionPanelBodyState
     return new PlatformMethod()
         .rawQuery(
         'SELECT e.NAME, e.DESCRIPTION, bg.NAME as BODY_GROUP FROM EXERCISES e JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID WHERE bg.NAME = ?;',
-        [_bodyGroup],
+        [_bodyGroup.name],
         false)
         .then((res) {
-      print(res);
       setState(() {
         _exercises = JSON
             .decode(res)
@@ -215,16 +218,37 @@ class _ExerciseExpansionPanelBodyState
   }
 }
 
-class _ExerciseListItem extends StatelessWidget {
-  Exercise exercise;
+class _ExerciseListItem extends StatefulWidget {
+  Exercise _exercise;
 
-  _ExerciseListItem(this.exercise);
+  _ExerciseListItem(this._exercise);
+
+  @override
+  State<StatefulWidget> createState() => new _ExerciseListItemState(_exercise);
+}
+
+class _ExerciseListItemState extends State<_ExerciseListItem> {
+  Exercise _exercise;
+  bool _selected = false;
+
+  _ExerciseListItemState(this._exercise);
+
+  void setSelected(bool value) {
+    setState(() => _selected = value);
+  }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return new ListTile(
-      title: new Text(exercise.name),
+      title: new Text(_exercise.name),
+      leading: new Checkbox(
+        value: _selected,
+        onChanged: this.setSelected,
+      ),
+      selected: _selected,
+      onTap: () {
+        this.setSelected(!_selected);
+      },
     );
   }
 }
