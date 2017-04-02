@@ -51,8 +51,8 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
     }
   }
 
-  String _validateName(InputValue value) {
-    if (value.text.isEmpty) {
+  String _validateName(String value) {
+    if (value.isEmpty) {
       return 'Name is required.';
     }
     return null;
@@ -66,15 +66,19 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
       child: new ListView(
         padding: new EdgeInsets.symmetric(horizontal: 16.0),
         children: <Widget>[
-          new TextField(
-            labelText: 'Name',
-            onSaved: (InputValue val) => _workout.name = val.text,
+          new TextFormField(
+            decoration: new InputDecoration(
+              labelText: 'Name',
+            ),
+            onSaved: (String val) => _workout.name = val,
             validator: _validateName,
           ),
-          new TextField(
-            labelText: 'Description',
-            hintText: 'Description (optional)',
-            onSaved: (InputValue val) => _workout.description = val.text,
+          new TextFormField(
+            decoration: new InputDecoration(
+              labelText: 'Description',
+              hintText: 'Description (optional)',
+            ),
+            onSaved: (String val) => _workout.description = val,
           ),
           new Container(
               alignment: new FractionalOffset(0.5, 0.5),
