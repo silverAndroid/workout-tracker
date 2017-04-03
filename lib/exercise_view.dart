@@ -82,12 +82,35 @@ class ExerciseState extends State<ExerciseView> {
 }
 
 class ExerciseList extends StatefulWidget {
+
+  List<Exercise> _selectedExercises = [];
+
   @override
-  State<StatefulWidget> createState() => new _ExerciseListState();
+  State<StatefulWidget> createState() => new _ExerciseListState(this._onSelected);
+
+  List<Exercise> getExercises() {
+    return _selectedExercises;
+  }
+
+  _onSelected(String exerciseName, bool selected) {
+    if (selected) {
+      new PlatformMethod().rawQuery('SELECT e.NAME, e.DESCRIPTION, bg.NAME as BODY_GROUP FROM EXERCISES e JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID WHERE e.NAME = ?;', [exerciseName], false).then((res) {
+        var exercise = JSON.decode(res)[0];
+        _selectedExercises.add(new Exercise(exercise['NAME'], exercise['BODY_GROUP'], exercise['DESCRIPTION']));
+        getExercises();
+      });
+    } else {
+      // TODO: Remove exercise from list
+    }
+  }
 }
 
 class _ExerciseListState extends State<ExerciseList> {
   List<BodyGroup> _bodyGroups;
+  List<Exercise> _exercises;
+  ExerciseSelected _onSelected;
+
+  _ExerciseListState(this._onSelected);
 
   @override
   void initState() {
@@ -129,7 +152,7 @@ class _ExerciseListState extends State<ExerciseList> {
           ),
         );
       },
-      body: new _ExerciseExpansionPanelBody(bodyGroup),
+      body: new _ExerciseExpansionPanelBody(bodyGroup, _onSelected),
       isExpanded: bodyGroup.isExpanded,
     ))
         .toList();
@@ -151,20 +174,22 @@ class _ExerciseListState extends State<ExerciseList> {
 
 class _ExerciseExpansionPanelBody extends StatefulWidget {
   BodyGroup _bodyGroup;
+  ExerciseSelected _onSelected;
 
-  _ExerciseExpansionPanelBody(this._bodyGroup);
+  _ExerciseExpansionPanelBody(this._bodyGroup, this._onSelected);
 
   @override
   State<StatefulWidget> createState() =>
-      new _ExerciseExpansionPanelBodyState(_bodyGroup);
+      new _ExerciseExpansionPanelBodyState(_bodyGroup, _onSelected);
 }
 
 class _ExerciseExpansionPanelBodyState
     extends State<_ExerciseExpansionPanelBody> {
   List<Exercise> _exercises;
   BodyGroup _bodyGroup;
+  ExerciseSelected _onSelected;
 
-  _ExerciseExpansionPanelBodyState(this._bodyGroup);
+  _ExerciseExpansionPanelBodyState(this._bodyGroup, this._onSelected);
 
   @override
   void initState() {
@@ -176,7 +201,6 @@ class _ExerciseExpansionPanelBodyState
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     Widget body;
     if (_exercises == null) {
       body = new Center(
@@ -185,18 +209,12 @@ class _ExerciseExpansionPanelBodyState
     } else {
       body = new ListView.builder(
         itemBuilder: (BuildContext context, int position) =>
-        new _ExerciseListItem(_exercises[position]),
+        new _ExerciseListItem(_exercises[position], _onSelected),
         itemCount: _exercises.length,
         shrinkWrap: true,
       );
     }
     return body;
-  }
-
-  List<_ExerciseListItem> buildExerciseList() {
-    return _exercises
-        .map((exercise) => new _ExerciseListItem(exercise))
-        .toList();
   }
 
   Future loadExercises() {
@@ -220,20 +238,23 @@ class _ExerciseExpansionPanelBodyState
 
 class _ExerciseListItem extends StatefulWidget {
   Exercise _exercise;
+  ExerciseSelected _onSelected;
 
-  _ExerciseListItem(this._exercise);
+  _ExerciseListItem(this._exercise, this._onSelected);
 
   @override
-  State<StatefulWidget> createState() => new _ExerciseListItemState(_exercise);
+  State<StatefulWidget> createState() => new _ExerciseListItemState(_exercise, _onSelected);
 }
 
 class _ExerciseListItemState extends State<_ExerciseListItem> {
   Exercise _exercise;
   bool _selected = false;
+  ExerciseSelected _onSelected;
 
-  _ExerciseListItemState(this._exercise);
+  _ExerciseListItemState(this._exercise, this._onSelected);
 
   void setSelected(bool value) {
+    _onSelected(_exercise.name, value);
     setState(() => _selected = value);
   }
 
@@ -259,3 +280,5 @@ class BodyGroup {
 
   BodyGroup(this.name, {this.isExpanded = false});
 }
+
+typedef void ExerciseSelected(String exerciseName, bool selected);
