@@ -32,31 +32,42 @@ class Data {
   ];
 
   static List<Workout> workouts = [
-    new Workout('Workout 1', 'Back and Chest', [
-      exercises[0],
-      exercises[2],
-    ],
-      [
+    new Workout(
+      'Workout 1',
+      'Back and Chest',
+      exercises: [
+        exercises[0],
+        exercises[2],
+      ],
+      days: [
         Day.MONDAY,
         Day.FRIDAY,
       ],
     ),
-    new Workout('Workout 2', 'Biceps, Calves and Shoulders', [
-      exercises[1],
-      exercises[3],
-      exercises[4],
-    ],
-      [
+    new Workout(
+      'Workout 2',
+      'Biceps, Calves and Shoulders',
+      exercises: [
+        exercises[1],
+        exercises[3],
+        exercises[4],
+      ],
+      days: [
         Day.THURSDAY,
         Day.TUESDAY,
       ],
     ),
-    new Workout('Workout 3', 'Biceps, Chest and Calves', [
-      exercises[2],
-      exercises[1],
-      exercises[3],
-    ],
-      [Day.SATURDAY],
+    new Workout(
+      'Workout 3',
+      'Biceps, Chest and Calves',
+      exercises: [
+        exercises[2],
+        exercises[1],
+        exercises[3],
+      ],
+      days: [
+        Day.SATURDAY
+      ],
     ),
   ];
 }

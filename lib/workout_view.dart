@@ -100,7 +100,11 @@ class _WorkoutListState extends State<_WorkoutList> {
         .rawQuery('SELECT * FROM workouts;', [], false)
         .then((json) {
       setState(() {
-        _workouts = JSON.decode(json).map((workout) => new Workout(workout['NAME'], workout['DESCRIPTION'], [], [])).toList();
+        _workouts = JSON.decode(json).map((workout) =>
+        new Workout(
+            workout['NAME'],
+            workout['DESCRIPTION']
+        )).toList();
       });
     });
   }

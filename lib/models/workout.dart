@@ -7,7 +7,8 @@ class Workout {
   List<Exercise> exercises = [];
   List<Day> days = [];
 
-  Workout(this.name, this.description, List<Exercise> exercises, List<Day> days) {
+  Workout(this.name, this.description, {List<Exercise> exercises, List<Day> days}) {
+    print(exercises);
     this.exercises.addAll(exercises);
     this.days.addAll(days);
   }

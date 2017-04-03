@@ -33,7 +33,7 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
   Form _form;
 
   _CreateWorkoutFormState() {
-    _workout = new Workout('', '', [], []);
+    _workout = new Workout('', '');
     _formKey = new GlobalKey<FormState>();
   }
 
