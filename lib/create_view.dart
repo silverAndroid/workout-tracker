@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:WorkoutTracker/exercise_view.dart';
+import 'package:WorkoutTracker/models/exercise.dart';
 import 'package:WorkoutTracker/models/workout.dart';
 import 'package:WorkoutTracker/platform_method.dart';
 import 'package:flutter/material.dart';
@@ -44,9 +47,7 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
           .rawQuery('INSERT INTO WORKOUTS (NAME, DESCRIPTION) VALUES (?, ?)',
           [_workout.name, _workout.description], true)
           .then((json) {
-        print('Query complete');
         Navigator.of(context).pop(true);
-        print('pop');
       });
     }
   }
@@ -85,10 +86,18 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
               padding: const EdgeInsets.all(16.0),
               child: new RaisedButton(
                 onPressed: () {
-                  Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (
-                          BuildContext context) => new SelectExercisesPage()
-                  ));
+                  Navigator.of(context).push(
+                      new MaterialPageRoute<List<Exercise>>(
+                          builder: (
+                              BuildContext context) => new SelectExercisesPage()
+                      )).then((exercises) {
+                    if (exercises != null) {
+                      print(exercises);
+                      setState(() {
+                        _workout.exercises.addAll(exercises);
+                      });
+                    }
+                  });
                 },
                 child: new Row(children: <Widget>[
                   new Icon(Icons.add),
@@ -111,7 +120,14 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
   }
 }
 
-class SelectExercisesPage extends StatelessWidget {
+class SelectExercisesPage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => new SelectExercisesState();
+}
+
+class SelectExercisesState extends State<SelectExercisesPage> {
+
+  ExerciseList _exercisesList = new ExerciseList();
 
   @override
   Widget build(BuildContext context) {
@@ -121,8 +137,16 @@ class SelectExercisesPage extends StatelessWidget {
         // was created by the App.build method, and use it to set
         // our appbar title.
         title: new Text('Workouts'),
+        actions: [
+          new IconButton(
+            icon: new Icon(Icons.check),
+            onPressed: () {
+              Navigator.of(context).pop(_exercisesList.getExercises());
+            },
+          )
+        ],
       ),
-      body: new ExerciseList(),
+      body: _exercisesList,
     );
   }
 }
