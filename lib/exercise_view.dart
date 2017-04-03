@@ -209,7 +209,7 @@ class _ExerciseExpansionPanelBodyState
     } else {
       body = new ListView.builder(
         itemBuilder: (BuildContext context, int position) =>
-        new _ExerciseListItem(_exercises[position], _onSelected),
+        new ExerciseListItem(_exercises[position], _onSelected),
         itemCount: _exercises.length,
         shrinkWrap: true,
       );
@@ -236,17 +236,17 @@ class _ExerciseExpansionPanelBodyState
   }
 }
 
-class _ExerciseListItem extends StatefulWidget {
+class ExerciseListItem extends StatefulWidget {
   Exercise _exercise;
   ExerciseSelected _onSelected;
 
-  _ExerciseListItem(this._exercise, this._onSelected);
+  ExerciseListItem(this._exercise, this._onSelected);
 
   @override
   State<StatefulWidget> createState() => new _ExerciseListItemState(_exercise, _onSelected);
 }
 
-class _ExerciseListItemState extends State<_ExerciseListItem> {
+class _ExerciseListItemState extends State<ExerciseListItem> {
   Exercise _exercise;
   bool _selected = false;
   ExerciseSelected _onSelected;
