@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:WorkoutTracker/exercise_view.dart';
 import 'package:WorkoutTracker/models/exercise.dart';
 import 'package:WorkoutTracker/models/workout.dart';
@@ -43,9 +41,12 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
       _autoValidate = true;
     } else {
       form.save();
+      List<String> queries = ['INSERT INTO WORKOUTS (NAME, DESCRIPTION) VALUES (?, ?);'];
+      queries.addAll(_workout.exercises.map((unused) => 'INSERT INTO WORKOUTS_EXERCISES VALUES ((SELECT ID FROM WORKOUTS WHERE NAME = ?), (SELECT ID FROM EXERCISES WHERE NAME = ?));'));
+      List<List<dynamic>> params = [[_workout.name, _workout.description]];
+      params.addAll(_workout.exercises.map((exercise) => [_workout.name, exercise.name]));
       new PlatformMethod()
-          .rawQuery('INSERT INTO WORKOUTS (NAME, DESCRIPTION) VALUES (?, ?)',
-          [_workout.name, _workout.description], true)
+          .runTransaction(queries, params, true)
           .then((json) {
         Navigator.of(context).pop(true);
       });
@@ -97,7 +98,6 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
                               BuildContext context) => new SelectExercisesPage()
                       )).then((exercises) {
                     if (exercises != null) {
-                      print(exercises);
                       setState(() {
                         _workout.exercises.addAll(exercises);
                       });
