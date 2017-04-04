@@ -94,9 +94,17 @@ class ExerciseList extends StatefulWidget {
 
   _onSelected(String exerciseName, bool selected) {
     if (selected) {
-      new PlatformMethod().rawQuery('SELECT e.NAME, e.DESCRIPTION, bg.NAME as BODY_GROUP FROM EXERCISES e JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID WHERE e.NAME = ?;', [exerciseName], false).then((res) {
+      new PlatformMethod().rawQuery(
+        'SELECT e.NAME, e.DESCRIPTION, bg.NAME as BODY_GROUP FROM EXERCISES e JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID WHERE e.NAME = ?;',
+        [exerciseName],
+        false,
+      ).then((res) {
         var exercise = JSON.decode(res)[0];
-        _selectedExercises.add(new Exercise(exercise['NAME'], exercise['BODY_GROUP'], exercise['DESCRIPTION']));
+        _selectedExercises.add(new Exercise(
+          exercise['NAME'],
+          exercise['BODY_GROUP'],
+          exercise['DESCRIPTION'],
+        ));
         getExercises();
       });
     } else {
@@ -209,7 +217,7 @@ class _ExerciseExpansionPanelBodyState
     } else {
       body = new ListView.builder(
         itemBuilder: (BuildContext context, int position) =>
-        new ExerciseListItem(_exercises[position], _onSelected),
+        new ExerciseListItem(_exercises[position], onSelected: _onSelected),
         itemCount: _exercises.length,
         shrinkWrap: true,
       );
@@ -240,10 +248,13 @@ class ExerciseListItem extends StatefulWidget {
   Exercise _exercise;
   ExerciseSelected _onSelected;
 
-  ExerciseListItem(this._exercise, this._onSelected);
+  ExerciseListItem(this._exercise, {onSelected}) {
+    this._onSelected = onSelected;
+  }
 
   @override
-  State<StatefulWidget> createState() => new _ExerciseListItemState(_exercise, _onSelected);
+  State<StatefulWidget> createState() =>
+      new _ExerciseListItemState(_exercise, _onSelected);
 }
 
 class _ExerciseListItemState extends State<ExerciseListItem> {
@@ -260,17 +271,23 @@ class _ExerciseListItemState extends State<ExerciseListItem> {
 
   @override
   Widget build(BuildContext context) {
-    return new ListTile(
-      title: new Text(_exercise.name),
-      leading: new Checkbox(
-        value: _selected,
-        onChanged: this.setSelected,
-      ),
-      selected: _selected,
-      onTap: () {
-        this.setSelected(!_selected);
-      },
-    );
+    if (this._onSelected == null) {
+      return new ListTile(
+        title: new Text(_exercise.name),
+      );
+    } else {
+      return new ListTile(
+        title: new Text(_exercise.name),
+        leading: new Checkbox(
+          value: _selected,
+          onChanged: this.setSelected,
+        ),
+        selected: _selected,
+        onTap: () {
+          this.setSelected(!_selected);
+        },
+      );
+    }
   }
 }
 
