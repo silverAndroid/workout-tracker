@@ -1,5 +1,5 @@
-import 'exercise.dart';
 import 'day.dart';
+import 'exercise.dart';
 
 class Workout {
   String name;
@@ -8,8 +8,9 @@ class Workout {
   List<Day> days = [];
 
   Workout(this.name, this.description, {List<Exercise> exercises, List<Day> days}) {
-    print(exercises);
-    this.exercises.addAll(exercises);
-    this.days.addAll(days);
+    if (exercises != null)
+      this.exercises.addAll(exercises);
+    if (days != null)
+      this.days.addAll(days);
   }
 }
