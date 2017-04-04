@@ -23,6 +23,8 @@ public class MainActivity extends FlutterActivity {
                     response.success("");
                 } else if (methodCall.method.equals("query")) {
                     queryExecutor.rawQuery((String) methodCall.arguments, response);
+                } else if (methodCall.method.equals("transaction")) {
+                    queryExecutor.runTransaction((String) methodCall.arguments, response);
                 }
             }
         });

@@ -11,6 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+
 import io.flutter.plugin.common.FlutterMethodChannel;
 
 /**
@@ -51,6 +53,35 @@ public class SQLiteQueryExecutor extends SQLiteAssetHelper {
                 Cursor cursor = database.rawQuery(query, params);
                 response.success(cursorToJSON(cursor).toString());
             }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            response.error(e.getMessage(), "", "");
+        }
+    }
+
+    void runTransaction(String queryJSON, FlutterMethodChannel.Response response) {
+        try {
+            JSONObject queriesObj = new JSONObject(queryJSON);
+            JSONArray queries = queriesObj.getJSONArray("queries");
+            String[] results = new String[queries.length()];
+
+            boolean write = queriesObj.getBoolean("write");
+            SQLiteDatabase database = write ? getWritableDatabase() : getReadableDatabase();
+            database.beginTransaction();
+            for (int i = 0, length = queries.length(); i < length; i++) {
+                JSONObject queryObj = queries.getJSONObject(i);
+                String query = queryObj.getString("query");
+                JSONArray paramsArray = queryObj.getJSONArray("params");
+                String[] params = new String[paramsArray.length()];
+                for (int j = 0; j < paramsArray.length(); j++) {
+                    params[j] = paramsArray.getString(j);
+                }
+                Cursor cursor = database.rawQuery(query, params);
+                results[i] = cursorToJSON(cursor).toString();
+            }
+            database.setTransactionSuccessful();
+            database.endTransaction();
+            response.success(Arrays.toString(results));
         } catch (JSONException e) {
             e.printStackTrace();
             response.error(e.getMessage(), "", "");
