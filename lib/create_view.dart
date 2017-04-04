@@ -81,6 +81,11 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
             ),
             onSaved: (String val) => _workout.description = val,
           ),
+          new ListView.builder(
+            itemBuilder: (BuildContext context, int position) => new ExerciseListItem(_workout.exercises[position]),
+            itemCount: _workout.exercises.length,
+            shrinkWrap: true,
+          ),
           new Container(
               alignment: new FractionalOffset(0.5, 0.5),
               padding: const EdgeInsets.all(16.0),
