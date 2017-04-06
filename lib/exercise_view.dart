@@ -86,7 +86,7 @@ class ExerciseList extends StatefulWidget {
   List<Exercise> _selectedExercises = [];
 
   @override
-  State<StatefulWidget> createState() => new _ExerciseListState(this._onSelected);
+  State<StatefulWidget> createState() => new _ExerciseListState();
 
   List<Exercise> getExercises() {
     return _selectedExercises;
@@ -116,9 +116,8 @@ class ExerciseList extends StatefulWidget {
 class _ExerciseListState extends State<ExerciseList> {
   List<BodyGroup> _bodyGroups;
   List<Exercise> _exercises;
-  ExerciseSelected _onSelected;
 
-  _ExerciseListState(this._onSelected);
+  _ExerciseListState();
 
   @override
   void initState() {
@@ -160,7 +159,7 @@ class _ExerciseListState extends State<ExerciseList> {
           ),
         );
       },
-      body: new _ExerciseExpansionPanelBody(bodyGroup, _onSelected),
+      body: new _ExerciseExpansionPanelBody(bodyGroup, config._onSelected),
       isExpanded: bodyGroup.isExpanded,
     ))
         .toList();
@@ -187,22 +186,17 @@ class _ExerciseExpansionPanelBody extends StatefulWidget {
   _ExerciseExpansionPanelBody(this._bodyGroup, this._onSelected);
 
   @override
-  State<StatefulWidget> createState() =>
-      new _ExerciseExpansionPanelBodyState(_bodyGroup, _onSelected);
+  State<StatefulWidget> createState() => new _ExerciseExpansionPanelBodyState();
 }
 
 class _ExerciseExpansionPanelBodyState
     extends State<_ExerciseExpansionPanelBody> {
   List<Exercise> _exercises;
-  BodyGroup _bodyGroup;
-  ExerciseSelected _onSelected;
-
-  _ExerciseExpansionPanelBodyState(this._bodyGroup, this._onSelected);
 
   @override
   void initState() {
     super.initState();
-    if (_exercises == null && _bodyGroup.isExpanded) {
+    if (_exercises == null && config._bodyGroup.isExpanded) {
       loadExercises();
     }
   }
@@ -217,7 +211,7 @@ class _ExerciseExpansionPanelBodyState
     } else {
       body = new ListView.builder(
         itemBuilder: (BuildContext context, int position) =>
-        new ExerciseListItem(_exercises[position], onSelected: _onSelected),
+        new ExerciseListItem(_exercises[position], onSelected: config._onSelected),
         itemCount: _exercises.length,
         shrinkWrap: true,
       );
@@ -229,7 +223,7 @@ class _ExerciseExpansionPanelBodyState
     return new PlatformMethod()
         .rawQuery(
         'SELECT e.NAME, e.DESCRIPTION, bg.NAME as BODY_GROUP FROM EXERCISES e JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID WHERE bg.NAME = ?;',
-        [_bodyGroup.name],
+        [config._bodyGroup.name],
         false)
         .then((res) {
       setState(() {
@@ -253,31 +247,28 @@ class ExerciseListItem extends StatefulWidget {
   }
 
   @override
-  State<StatefulWidget> createState() =>
-      new _ExerciseListItemState(_exercise, _onSelected);
+  State<StatefulWidget> createState() => new _ExerciseListItemState();
 }
 
 class _ExerciseListItemState extends State<ExerciseListItem> {
-  Exercise _exercise;
   bool _selected = false;
-  ExerciseSelected _onSelected;
 
-  _ExerciseListItemState(this._exercise, this._onSelected);
+  _ExerciseListItemState();
 
   void setSelected(bool value) {
-    _onSelected(_exercise.name, value);
+    config._onSelected(config._exercise.name, value);
     setState(() => _selected = value);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (this._onSelected == null) {
+    if (config._onSelected == null) {
       return new ListTile(
-        title: new Text(_exercise.name),
+        title: new Text(config._exercise.name),
       );
     } else {
       return new ListTile(
-        title: new Text(_exercise.name),
+        title: new Text(config._exercise.name),
         leading: new Checkbox(
           value: _selected,
           onChanged: this.setSelected,
