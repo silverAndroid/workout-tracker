@@ -102,8 +102,9 @@ class _WorkoutListState extends State<_WorkoutList> {
       setState(() {
         _workouts = JSON.decode(json).map((workout) =>
         new Workout(
-            workout['NAME'],
-            workout['DESCRIPTION']
+          workout['ID'],
+          workout['NAME'],
+          workout['DESCRIPTION'],
         )).toList();
       });
     });

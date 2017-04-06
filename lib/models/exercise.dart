@@ -1,6 +1,7 @@
 import 'set.dart';
 
 class Exercise {
+  int id;
   String name;
   String bodyGroup;
   String description;
@@ -8,6 +9,6 @@ class Exercise {
   int recommendedReps = -1; // recommended reps per set
   int recommendedSets = -1;
 
-  Exercise(this.name, this.bodyGroup, this.description,
+  Exercise(this.id, this.name, this.bodyGroup, this.description,
       {this.recommendedReps, this.recommendedSets}) : sets = [];
 }

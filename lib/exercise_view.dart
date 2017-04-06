@@ -95,12 +95,13 @@ class ExerciseList extends StatefulWidget {
   _onSelected(String exerciseName, bool selected) {
     if (selected) {
       new PlatformMethod().rawQuery(
-        'SELECT e.NAME, e.DESCRIPTION, bg.NAME as BODY_GROUP FROM EXERCISES e JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID WHERE e.NAME = ?;',
+        'SELECT e.ID, e.NAME, e.DESCRIPTION, bg.NAME as BODY_GROUP FROM EXERCISES e JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID WHERE e.NAME = ?;',
         [exerciseName],
         false,
       ).then((res) {
         var exercise = JSON.decode(res)[0];
         _selectedExercises.add(new Exercise(
+          exercise['ID'],
           exercise['NAME'],
           exercise['BODY_GROUP'],
           exercise['DESCRIPTION'],
@@ -211,7 +212,8 @@ class _ExerciseExpansionPanelBodyState
     } else {
       body = new ListView.builder(
         itemBuilder: (BuildContext context, int position) =>
-        new ExerciseListItem(_exercises[position], onSelected: config._onSelected),
+        new ExerciseListItem(
+            _exercises[position], onSelected: config._onSelected),
         itemCount: _exercises.length,
         shrinkWrap: true,
       );
@@ -222,7 +224,7 @@ class _ExerciseExpansionPanelBodyState
   Future loadExercises() {
     return new PlatformMethod()
         .rawQuery(
-        'SELECT e.NAME, e.DESCRIPTION, bg.NAME as BODY_GROUP FROM EXERCISES e JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID WHERE bg.NAME = ?;',
+        'SELECT e.ID, e.NAME, e.DESCRIPTION, bg.NAME as BODY_GROUP FROM EXERCISES e JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID WHERE bg.NAME = ?;',
         [config._bodyGroup.name],
         false)
         .then((res) {
@@ -230,8 +232,12 @@ class _ExerciseExpansionPanelBodyState
         _exercises = JSON
             .decode(res)
             .map((exercise) =>
-        new Exercise(exercise['NAME'],
-            exercise['DESCRIPTION'], exercise['BODY_GROUP']))
+        new Exercise(
+          exercise['ID'],
+          exercise['NAME'],
+          exercise['DESCRIPTION'],
+          exercise['BODY_GROUP'],
+        ))
             .toList();
       });
     });
