@@ -5,7 +5,6 @@ import 'package:WorkoutTracker/create_view.dart';
 import 'package:flutter/material.dart';
 
 import 'exercise_view.dart';
-import 'fake_data.dart';
 import 'models/exercise.dart';
 import 'models/workout.dart';
 import 'platform_method.dart';
@@ -91,7 +90,7 @@ class _WorkoutListState extends State<_WorkoutList> {
   }
 
   List<_WorkoutListItem> buildWorkoutList() {
-    return _workouts.map((workout) => new _WorkoutListItem(workout, 0))
+    return _workouts.map((workout) => new _WorkoutListItem(workout))
         .toList();
   }
 
@@ -113,10 +112,9 @@ class _WorkoutListState extends State<_WorkoutList> {
 
 class _WorkoutListItem extends StatelessWidget {
 
-  Workout workout;
-  int index;
+  Workout _workout;
 
-  _WorkoutListItem(this.workout, this.index);
+  _WorkoutListItem(this._workout);
 
   @override
   Widget build(BuildContext context) {
@@ -127,25 +125,26 @@ class _WorkoutListItem extends StatelessWidget {
     return new MyCard(
       onTap: () {
         Navigator.of(context).push(new MaterialPageRoute(
-          builder: (BuildContext context) => new WorkoutDetailsPage(index),
+          builder: (BuildContext context) =>
+          new WorkoutDetailsPage(_workout.id),
         ));
       },
       child: new Column(
         children: [
           new Container(
-              child: new Text(workout.name, style: titleStyle),
+              child: new Text(_workout.name, style: titleStyle),
               alignment: FractionalOffset.topLeft,
               margin: new EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0)
           ),
           new Container(
-            child: new Text(workout.description, style: subtitleStyle),
+            child: new Text(_workout.description, style: subtitleStyle),
             alignment: FractionalOffset.centerLeft,
             margin: new EdgeInsets.symmetric(
               horizontal: 8.0,
             ),
           ),
           new Container(
-            child: new Text(workout.days.join(', ')),
+            child: new Text(_workout.days.join(', ')),
             alignment: FractionalOffset.centerLeft,
             margin: new EdgeInsets.symmetric(
               vertical: 4.0,
@@ -196,24 +195,50 @@ class WorkoutDetailsList extends StatefulWidget {
 
 class WorkoutDetailsState extends State<WorkoutDetailsList> {
 
-  List<Exercise> exercises;
+  List<Exercise> _exercises;
 
   @override
   void initState() {
     super.initState();
-    exercises = Data.workouts[config.workoutID].exercises;
+    loadExercises();
   }
 
   @override
   Widget build(BuildContext context) {
-    return new ListView(
-      children: buildWorkoutDetailsList(),
-    );
+    Widget body;
+    if (_exercises == null) {
+      body = new Center(
+        child: new CircularProgressIndicator(),
+      );
+    } else {
+      body = new ListView(
+        children: buildWorkoutDetailsList(),
+      );
+    }
+    return body;
   }
 
   List<_WorkoutDetailsListItem> buildWorkoutDetailsList() {
-    return exercises.map((exercise) => new _WorkoutDetailsListItem(exercise))
+    return _exercises.map((exercise) => new _WorkoutDetailsListItem(exercise))
         .toList();
+  }
+
+  Future loadExercises() {
+    return new PlatformMethod().rawQuery(
+      'SELECT e.ID, e.NAME, e.DESCRIPTION, bg.NAME as BODY_GROUP FROM EXERCISES e JOIN WORKOUTS_EXERCISES we ON e.ID = we.EXERCISE_ID JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID WHERE WORKOUT_ID = ?;',
+      [config.workoutID],
+      false,
+    ).then((json) {
+      setState(() {
+        _exercises = JSON.decode(json).map((exercise) =>
+        new Exercise(
+          exercise['ID'],
+          exercise['NAME'],
+          exercise['BODY_GROUP'],
+          exercise['DESCRIPTION'],
+        )).toList();
+      });
+    });
   }
 }
 
@@ -225,17 +250,28 @@ class _WorkoutDetailsListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return new ListTile(
-      title: new Text(exercise.name),
-      subtitle: new Text(
-        '${exercise.recommendedSets} sets of ${exercise.recommendedReps}',
-      ),
-      onTap: () {
-        Navigator.of(context).push(new MaterialPageRoute<Null>(
-          builder: (BuildContext context) => new ExercisePage(0),
-        ));
-      },
-    );
+    Widget body,
+        title = new Text(exercise.name);
+    VoidCallback onTap = () {
+      Navigator.of(context).push(new MaterialPageRoute<Null>(
+        builder: (BuildContext context) => new ExercisePage(exercise.id),
+      ));
+    };
+
+    if (exercise.recommendedReps == null || exercise.recommendedSets == null) {
+      body = new ListTile(
+        title: title,
+        onTap: onTap,
+      );
+    } else {
+      body = new ListTile(
+        title: title,
+        subtitle: new Text(
+          '${exercise.recommendedSets} sets of ${exercise.recommendedReps}',
+        ),
+        onTap: onTap,
+      );
+    }
+    return body;
   }
 }
