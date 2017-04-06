@@ -22,7 +22,7 @@ class ExercisePage extends StatelessWidget {
         // our appbar title.
         title: new Text('Workouts'),
       ),
-      body: new ExerciseView(),
+      body: new ExerciseView(exerciseID),
       floatingActionButton: new FloatingActionButton(
         onPressed: (() => print('FAB pressed, not incrementing..')),
         tooltip: 'Increment',
@@ -33,6 +33,11 @@ class ExercisePage extends StatelessWidget {
 }
 
 class ExerciseView extends StatefulWidget {
+
+  int exerciseID;
+
+  ExerciseView(this.exerciseID);
+
   @override
   State<StatefulWidget> createState() => new ExerciseState();
 }
@@ -50,7 +55,7 @@ class ExerciseState extends State<ExerciseView> {
       form.save();
       new PlatformMethod().rawQuery(
           'INSERT INTO SETS (NUM_REPS, WEIGHT, EXERCISE_ID) VALUES (?, ?, ?)',
-          [numReps, weight, 0],
+          [numReps, weight, config.exerciseID],
           true);
     }
   }
