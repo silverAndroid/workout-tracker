@@ -28,7 +28,6 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
   Workout _workout;
   bool _autoValidate = false;
   GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  Form _form;
 
   _CreateWorkoutFormState() {
     _workout = new Workout(-1, '', '');
@@ -62,7 +61,7 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
 
   @override
   Widget build(BuildContext context) {
-    _form = new Form(
+    return new Form(
       key: _formKey,
       autovalidate: _autoValidate,
       child: new ListView(
@@ -120,8 +119,6 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
         ],
       ),
     );
-
-    return _form;
   }
 }
 
