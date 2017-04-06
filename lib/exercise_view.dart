@@ -39,40 +39,76 @@ class ExerciseView extends StatefulWidget {
 
 class ExerciseState extends State<ExerciseView> {
   int numReps, weight;
+  GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  bool _autoValidate = false;
 
-  void submit() {
-    new PlatformMethod().rawQuery(
-        'INSERT INTO SETS (NUM_REPS, WEIGHT, EXERCISE_ID) VALUES (?, ?, ?)',
-        [numReps, weight, 0],
-        true);
+  void _handleSubmit(BuildContext context) {
+    final FormState form = _formKey.currentState;
+    if (!form.validate()) {
+      _autoValidate = true;
+    } else {
+      form.save();
+      new PlatformMethod().rawQuery(
+          'INSERT INTO SETS (NUM_REPS, WEIGHT, EXERCISE_ID) VALUES (?, ?, ?)',
+          [numReps, weight, 0],
+          true);
+    }
+  }
+
+  String _validateNumReps(String value) {
+    if (value.isEmpty) {
+      return 'Number of reps cannot be empty.';
+    }
+    try {
+      int reps = int.parse(value);
+      if (reps < 0)
+        return 'Reps cannot be less than 0.';
+      return null;
+    } on FormatException {
+      return 'Invalid number, please enter a valid one.';
+    }
+  }
+
+  String _validateWeight(String value) {
+    if (value.isEmpty) {
+      return 'Weight cannot be empty.';
+    }
+    try {
+      int weight = int.parse(value);
+      if (weight < 0)
+        return 'Weight cannot be less than 0.';
+      return null;
+    } on FormatException {
+      return 'Invalid number, please enter a valid one.';
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return new Container(
-      child: new Column(
+    return new Form(
+      key: _formKey,
+      autovalidate: _autoValidate,
+      child: new ListView(
+        padding: new EdgeInsets.symmetric(horizontal: 16.0),
         children: [
-          new TextField(
-            onChanged: (String value) {
-              if (value.isNotEmpty) numReps = int.parse(value);
-            },
+          new TextFormField(
+            onSaved: (String value) => numReps = int.parse(value),
             decoration: new InputDecoration(
               labelText: 'Reps',
             ),
             keyboardType: TextInputType.number,
+            validator: _validateNumReps,
           ),
-          new TextField(
-            onChanged: (String value) {
-              if (value.isNotEmpty) weight = int.parse(value);
-            },
+          new TextFormField(
+            onSaved: (String value) => weight = int.parse(value),
             decoration: new InputDecoration(
               labelText: 'Weight',
             ),
             keyboardType: TextInputType.number,
+            validator: _validateWeight,
           ),
           new RaisedButton(
-            onPressed: submit,
+            onPressed: () => _handleSubmit(context),
             child: new Text('Submit'),
           )
         ],
