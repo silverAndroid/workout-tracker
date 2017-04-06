@@ -14,7 +14,6 @@ class ExercisePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return new Scaffold(
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that
@@ -23,11 +22,6 @@ class ExercisePage extends StatelessWidget {
         title: new Text('Workouts'),
       ),
       body: new ExerciseView(exerciseID),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: (() => print('FAB pressed, not incrementing..')),
-        tooltip: 'Increment',
-        child: new Icon(Icons.add),
-      ),
     );
   }
 }
