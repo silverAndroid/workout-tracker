@@ -173,12 +173,6 @@ class WorkoutDetailsPage extends StatelessWidget {
         title: new Text('Exercises'),
       ),
       body: new WorkoutDetailsList(workoutID),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: (() => print('FAB pressed, not incrementing..')),
-        tooltip: 'Increment',
-        child: new Icon(Icons.add),
-      ), // This trailing comma tells the Dart formatter to use
-      // a style that looks nicer for build methods.
     );
   }
 }
