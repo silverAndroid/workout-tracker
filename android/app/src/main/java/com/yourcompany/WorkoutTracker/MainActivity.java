@@ -18,13 +18,17 @@ public class MainActivity extends FlutterActivity {
         new FlutterMethodChannel(getFlutterView(), DB_CHANNEL).setMethodCallHandler(new FlutterMethodChannel.MethodCallHandler() {
             @Override
             public void onMethodCall(MethodCall methodCall, FlutterMethodChannel.Response response) {
-                if (methodCall.method.equals("initDB")) {
-                    initDB();
-                    response.success("");
-                } else if (methodCall.method.equals("query")) {
-                    queryExecutor.rawQuery((String) methodCall.arguments, response);
-                } else if (methodCall.method.equals("transaction")) {
-                    queryExecutor.runTransaction((String) methodCall.arguments, response);
+                switch (methodCall.method) {
+                    case "initDB":
+                        initDB();
+                        response.success("");
+                        break;
+                    case "query":
+                        queryExecutor.rawQuery((String) methodCall.arguments, response);
+                        break;
+                    case "transaction":
+                        queryExecutor.runTransaction((String) methodCall.arguments, response);
+                        break;
                 }
             }
         });
