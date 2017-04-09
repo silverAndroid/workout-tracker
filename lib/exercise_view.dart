@@ -78,7 +78,8 @@ class ExerciseViewState extends State<ExerciseView> {
   }
 
   void openYouTubeVideo() {
-
+    String youtubeURL = 'vnd.youtube://${_exercise.youtubeID}';
+    new PlatformMethod().openURL(youtubeURL);
   }
 
   @override
@@ -113,6 +114,7 @@ class ExerciseViewState extends State<ExerciseView> {
           new ListTile(
             title: new Text('View on YouTube'),
             trailing: new Icon(Icons.open_in_new),
+            onTap: this.openYouTubeVideo,
           ),
         ],
       );

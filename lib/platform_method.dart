@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 class PlatformMethod {
   static final PlatformMethod _instance = new PlatformMethod._internal();
   PlatformMethodChannel dbPlatform;
+  PlatformMethodChannel androidPlatform;
 
   factory PlatformMethod() {
     return _instance;
@@ -13,6 +14,7 @@ class PlatformMethod {
 
   PlatformMethod._internal() {
     dbPlatform = const PlatformMethodChannel('database');
+    androidPlatform = const PlatformMethodChannel('android');
   }
 
   Future<String> rawQuery(String query, List<dynamic> params, bool writeToDB,
@@ -62,5 +64,18 @@ class PlatformMethod {
       print(e.message);
     }
     return new Future<String>.value("[]");
+  }
+  
+  Future<bool> openURL(String url) {
+    if (url == null || url.isEmpty)
+      return new Future<bool>.value(false);
+    
+    try {
+      return androidPlatform.invokeMethod('openURL', url);
+    } on PlatformException catch (e) {
+      print('Failed to open url $url');
+      print(e.message);
+    }
+    return new Future<bool>.value(false);
   }
 }
