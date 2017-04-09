@@ -7,21 +7,52 @@ import 'package:flutter/services.dart';
 
 import 'platform_method.dart';
 
-class ExercisePage extends StatelessWidget {
+class ExercisePage extends StatefulWidget {
   int exerciseID;
 
   ExercisePage(this.exerciseID);
 
   @override
+  State<StatefulWidget> createState() => new ExercisePageState();
+}
+
+class ExercisePageState extends State<ExercisePage>
+    with SingleTickerProviderStateMixin {
+  TabController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = new TabController(vsync: this, length: 2);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        // Here we take the value from the MyHomePage object that
-        // was created by the App.build method, and use it to set
-        // our appbar title.
+        bottom: new TabBar(
+          controller: _controller,
+          isScrollable: true,
+          tabs: [
+            new Tab(text: 'Info'),
+            new Tab(text: 'Log'),
+          ],
+        ),
         title: new Text('Workouts'),
       ),
-      body: new ExerciseView(exerciseID),
+      body: new TabBarView(
+        children: [
+          new ExerciseView(config.exerciseID),
+          new ExerciseForm(config.exerciseID),
+        ],
+        controller: _controller,
+      ),
     );
   }
 }
@@ -33,10 +64,91 @@ class ExerciseView extends StatefulWidget {
   ExerciseView(this.exerciseID);
 
   @override
-  State<StatefulWidget> createState() => new ExerciseState();
+  State<StatefulWidget> createState() => new ExerciseViewState();
 }
 
-class ExerciseState extends State<ExerciseView> {
+class ExerciseViewState extends State<ExerciseView> {
+
+  Exercise _exercise;
+
+  @override
+  void initState() {
+    super.initState();
+    loadExercise();
+  }
+
+  void openYouTubeVideo() {
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    Widget body;
+
+    if (_exercise == null) {
+      body = new Center(
+        child: new CircularProgressIndicator(),
+      );
+    } else {
+      List<Widget> instructionWidgets = [
+        new Container(
+          padding: new EdgeInsets.symmetric(vertical: 16.0),
+          child: new Text(
+            'Instructions',
+            style: theme.textTheme.headline,
+          ),
+        ),
+      ];
+      instructionWidgets.addAll(
+          _exercise.steps.map((step) => new Text(step)).toList());
+
+      body = new Column(
+        children: [
+          new ListView(
+            padding: new EdgeInsets.symmetric(horizontal: 16.0),
+            children: instructionWidgets,
+            shrinkWrap: true,
+          ),
+          new ListTile(
+            title: new Text('View on YouTube'),
+            trailing: new Icon(Icons.open_in_new),
+          ),
+        ],
+      );
+    }
+    return body;
+  }
+
+  Future loadExercise() {
+    return new PlatformMethod().rawQuery(
+      'SELECT e.ID, e.NAME, e.DESCRIPTION, e.YOUTUBE_ID, bg.NAME as BODY_GROUP, es.STEP FROM EXERCISES e JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID JOIN EXERCISES_STEPS es ON es.EXERCISE_ID = e.ID WHERE e.ID = ? ORDER BY es.STEP_NUMBER ASC;',
+      [
+        config.exerciseID,
+      ],
+      false,
+    ).then((res) {
+      dynamic json = JSON.decode(res);
+      dynamic row = json[0];
+      _exercise = new Exercise(
+          row['ID'], row['NAME'], row['BODY_GROUP'], row['DESCRIPTION'],
+          youtubeID: row['YOUTUBE_ID']);
+      _exercise.steps = json.map((step) => step['STEP']).toList();
+    });
+  }
+}
+
+class ExerciseForm extends StatefulWidget {
+
+  int exerciseID;
+
+  ExerciseForm(this.exerciseID);
+
+  @override
+  State<StatefulWidget> createState() => new ExerciseFormState();
+}
+
+class ExerciseFormState extends State<ExerciseForm> {
   int numReps, weight;
   GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   bool _autoValidate = false;
