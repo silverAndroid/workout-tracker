@@ -234,6 +234,8 @@ class ExerciseList extends StatefulWidget {
 
   List<Exercise> _selectedExercises = [];
 
+  ExerciseList(this._selectedExercises);
+
   @override
   State<StatefulWidget> createState() => new _ExerciseListState();
 
@@ -258,7 +260,7 @@ class ExerciseList extends StatefulWidget {
         getExercises();
       });
     } else {
-      // TODO: Remove exercise from list
+      _selectedExercises.removeWhere((exercise) => exercise.name == exerciseName);
     }
   }
 }
@@ -309,7 +311,7 @@ class _ExerciseListState extends State<ExerciseList> {
           ),
         );
       },
-      body: new _ExerciseExpansionPanelBody(bodyGroup, config._onSelected),
+      body: new _ExerciseExpansionPanelBody(bodyGroup, config._onSelected, config._selectedExercises),
       isExpanded: bodyGroup.isExpanded,
     ))
         .toList();
@@ -332,8 +334,9 @@ class _ExerciseListState extends State<ExerciseList> {
 class _ExerciseExpansionPanelBody extends StatefulWidget {
   BodyGroup _bodyGroup;
   ExerciseSelected _onSelected;
+  List<Exercise> _selectedExercises;
 
-  _ExerciseExpansionPanelBody(this._bodyGroup, this._onSelected);
+  _ExerciseExpansionPanelBody(this._bodyGroup, this._onSelected, this._selectedExercises);
 
   @override
   State<StatefulWidget> createState() => new _ExerciseExpansionPanelBodyState();
@@ -362,7 +365,10 @@ class _ExerciseExpansionPanelBodyState
       body = new ListView.builder(
         itemBuilder: (BuildContext context, int position) =>
         new ExerciseListItem(
-            _exercises[position], onSelected: config._onSelected),
+          _exercises[position],
+          onSelected: config._onSelected,
+          selected: config._selectedExercises.any((exercise) => exercise.name == _exercises[position].name)
+        ),
         itemCount: _exercises.length,
         shrinkWrap: true,
       );
@@ -396,9 +402,11 @@ class _ExerciseExpansionPanelBodyState
 class ExerciseListItem extends StatefulWidget {
   Exercise _exercise;
   ExerciseSelected _onSelected;
+  bool _selected;
 
-  ExerciseListItem(this._exercise, {onSelected}) {
+  ExerciseListItem(this._exercise, {onSelected, selected = false}) {
     this._onSelected = onSelected;
+    this._selected = selected;
   }
 
   @override
@@ -406,13 +414,12 @@ class ExerciseListItem extends StatefulWidget {
 }
 
 class _ExerciseListItemState extends State<ExerciseListItem> {
-  bool _selected = false;
 
   _ExerciseListItemState();
 
   void setSelected(bool value) {
     config._onSelected(config._exercise.name, value);
-    setState(() => _selected = value);
+    setState(() => config._selected = value);
   }
 
   @override
@@ -425,12 +432,12 @@ class _ExerciseListItemState extends State<ExerciseListItem> {
       return new ListTile(
         title: new Text(config._exercise.name),
         leading: new Checkbox(
-          value: _selected,
+          value: config._selected,
           onChanged: this.setSelected,
         ),
-        selected: _selected,
+        selected: config._selected,
         onTap: () {
-          this.setSelected(!_selected);
+          this.setSelected(!config._selected);
         },
       );
     }
