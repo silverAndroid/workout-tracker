@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class MyCard extends Card {
 
-  GestureTapCallback onTap;
+  final GestureTapCallback onTap;
 
   MyCard({Key key, Color color, double elevation = 2.0, Widget child, this.onTap}) : super(key: key, color: color, elevation: elevation, child: child);
 
