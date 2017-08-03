@@ -139,7 +139,7 @@ class SelectExercisesState extends State<SelectExercisesPage> {
   @override
   void initState() {
     super.initState();
-    _exercisesList = new ExerciseList(config.exercises);
+    _exercisesList = new ExerciseList(widget.exercises);
   }
 
   @override

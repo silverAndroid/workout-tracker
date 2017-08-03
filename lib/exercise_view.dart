@@ -48,8 +48,8 @@ class ExercisePageState extends State<ExercisePage>
       ),
       body: new TabBarView(
         children: [
-          new ExerciseView(config.exerciseID),
-          new ExerciseForm(config.exerciseID),
+          new ExerciseView(widget.exerciseID),
+          new ExerciseForm(widget.exerciseID),
         ],
         controller: _controller,
       ),
@@ -126,7 +126,7 @@ class ExerciseViewState extends State<ExerciseView> {
     return new PlatformMethod().rawQuery(
       'SELECT e.ID, e.NAME, e.DESCRIPTION, e.YOUTUBE_ID, bg.NAME as BODY_GROUP, es.STEP FROM EXERCISES e JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID JOIN EXERCISES_STEPS es ON es.EXERCISE_ID = e.ID WHERE e.ID = ? ORDER BY es.STEP_NUMBER ASC;',
       [
-        config.exerciseID,
+        widget.exerciseID,
       ],
       false,
     ).then((res) {
@@ -163,7 +163,7 @@ class ExerciseFormState extends State<ExerciseForm> {
       form.save();
       new PlatformMethod().rawQuery(
           'INSERT INTO SETS (NUM_REPS, WEIGHT, EXERCISE_ID) VALUES (?, ?, ?)',
-          [numReps, weight, config.exerciseID],
+          [numReps, weight, widget.exerciseID],
           true);
     }
   }
@@ -311,7 +311,7 @@ class _ExerciseListState extends State<ExerciseList> {
           ),
         );
       },
-      body: new _ExerciseExpansionPanelBody(bodyGroup, config._onSelected, config._selectedExercises),
+      body: new _ExerciseExpansionPanelBody(bodyGroup, widget._onSelected, widget._selectedExercises),
       isExpanded: bodyGroup.isExpanded,
     ))
         .toList();
@@ -349,7 +349,7 @@ class _ExerciseExpansionPanelBodyState
   @override
   void initState() {
     super.initState();
-    if (_exercises == null && config._bodyGroup.isExpanded) {
+    if (_exercises == null && widget._bodyGroup.isExpanded) {
       loadExercises();
     }
   }
@@ -366,8 +366,8 @@ class _ExerciseExpansionPanelBodyState
         itemBuilder: (BuildContext context, int position) =>
         new ExerciseListItem(
           _exercises[position],
-          onSelected: config._onSelected,
-          selected: config._selectedExercises.any((exercise) => exercise.name == _exercises[position].name)
+          onSelected: widget._onSelected,
+          selected: widget._selectedExercises.any((exercise) => exercise.name == _exercises[position].name)
         ),
         itemCount: _exercises.length,
         shrinkWrap: true,
@@ -380,7 +380,7 @@ class _ExerciseExpansionPanelBodyState
     return new PlatformMethod()
         .rawQuery(
         'SELECT e.ID, e.NAME, e.DESCRIPTION, bg.NAME as BODY_GROUP FROM EXERCISES e JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID WHERE bg.NAME = ?;',
-        [config._bodyGroup.name],
+        [widget._bodyGroup.name],
         false)
         .then((res) {
       setState(() {
@@ -418,26 +418,26 @@ class _ExerciseListItemState extends State<ExerciseListItem> {
   _ExerciseListItemState();
 
   void setSelected(bool value) {
-    config._onSelected(config._exercise.name, value);
-    setState(() => config._selected = value);
+    widget._onSelected(widget._exercise.name, value);
+    setState(() => widget._selected = value);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (config._onSelected == null) {
+    if (widget._onSelected == null) {
       return new ListTile(
-        title: new Text(config._exercise.name),
+        title: new Text(widget._exercise.name),
       );
     } else {
       return new ListTile(
-        title: new Text(config._exercise.name),
+        title: new Text(widget._exercise.name),
         leading: new Checkbox(
-          value: config._selected,
+          value: widget._selected,
           onChanged: this.setSelected,
         ),
-        selected: config._selected,
+        selected: widget._selected,
         onTap: () {
-          this.setSelected(!config._selected);
+          this.setSelected(!widget._selected);
         },
       );
     }

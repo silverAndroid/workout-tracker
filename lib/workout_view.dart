@@ -220,7 +220,7 @@ class WorkoutDetailsState extends State<WorkoutDetailsList> {
   Future loadExercises() {
     return new PlatformMethod().rawQuery(
       'SELECT e.ID, e.NAME, e.DESCRIPTION, bg.NAME as BODY_GROUP FROM EXERCISES e JOIN WORKOUTS_EXERCISES we ON e.ID = we.EXERCISE_ID JOIN BODY_GROUPS bg ON bg.ID = e.PRIMARY_BODY_GROUP_ID WHERE WORKOUT_ID = ?;',
-      [config.workoutID],
+      [widget.workoutID],
       false,
     ).then((json) {
       setState(() {
