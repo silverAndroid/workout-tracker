@@ -94,11 +94,11 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
                   Navigator.of(context).push(
                       new MaterialPageRoute<List<Exercise>>(
                           builder: (
-                              BuildContext context) => new SelectExercisesPage()
+                              BuildContext context) => new SelectExercisesPage(_workout.exercises)
                       )).then((exercises) {
                     if (exercises != null) {
                       setState(() {
-                        _workout.exercises.addAll(exercises);
+                        _workout.exercises = exercises;
                       });
                     }
                   });
@@ -123,13 +123,24 @@ class _CreateWorkoutFormState extends State<_CreateWorkoutForm> {
 }
 
 class SelectExercisesPage extends StatefulWidget {
+
+  List<Exercise> exercises;
+
+  SelectExercisesPage(this.exercises);
+
   @override
   State<StatefulWidget> createState() => new SelectExercisesState();
 }
 
 class SelectExercisesState extends State<SelectExercisesPage> {
 
-  ExerciseList _exercisesList = new ExerciseList();
+  ExerciseList _exercisesList;
+
+  @override
+  void initState() {
+    super.initState();
+    _exercisesList = new ExerciseList(config.exercises);
+  }
 
   @override
   Widget build(BuildContext context) {
