@@ -5,16 +5,16 @@ import 'package:flutter/services.dart';
 
 class PlatformMethod {
   static final PlatformMethod _instance = new PlatformMethod._internal();
-  PlatformMethodChannel dbPlatform;
-  PlatformMethodChannel androidPlatform;
+  MethodChannel dbPlatform;
+  MethodChannel androidPlatform;
 
   factory PlatformMethod() {
     return _instance;
   }
 
   PlatformMethod._internal() {
-    dbPlatform = const PlatformMethodChannel('database');
-    androidPlatform = const PlatformMethodChannel('android');
+    dbPlatform = const MethodChannel('database');
+    androidPlatform = const MethodChannel('android');
   }
 
   Future<String> rawQuery(String query, List<dynamic> params, bool writeToDB,
